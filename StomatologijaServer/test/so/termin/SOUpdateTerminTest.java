@@ -1,6 +1,5 @@
 package so.termin;
 
-import domain.AbstractDomainObject;
 import domain.Klijent;
 import domain.StavkaTermina;
 import domain.Stomatolog;
@@ -13,6 +12,9 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import db.DBBroker;
+import java.sql.SQLException;
+import org.junit.After;
 
 public class SOUpdateTerminTest {
 
@@ -25,6 +27,22 @@ public class SOUpdateTerminTest {
         termin = new Termin();
     }
 
+    @After
+    public void tearDown() throws SQLException {
+        if (termin != null && termin.getTerminID() > 0) {
+            DBBroker.getInstance().getConnection()
+                    .createStatement()
+                    .executeUpdate(
+                        "DELETE FROM termin WHERE TerminID = " + termin.getTerminID()
+                    );
+
+            DBBroker.getInstance().getConnection().commit();
+        }
+
+        so = null;
+        termin = null;
+    }
+    
     private Date datumUBuducnosti() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.YEAR, 1);
@@ -85,8 +103,7 @@ public class SOUpdateTerminTest {
 
     @Test(expected = Exception.class)
     public void testPredusloviNeispravanObjekat() throws Exception {
-
-        so.validate((AbstractDomainObject) new Object());
+        so.validate(new Klijent());
     }
 
     @Test(expected = Exception.class)

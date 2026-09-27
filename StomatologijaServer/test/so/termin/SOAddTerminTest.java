@@ -1,7 +1,6 @@
 package so.termin;
 
 import db.DBBroker;
-import domain.AbstractDomainObject;
 import domain.Klijent;
 import domain.StavkaTermina;
 import domain.Stomatolog;
@@ -92,7 +91,7 @@ public class SOAddTerminTest {
 
     @Test(expected = Exception.class)
     public void testPredusloviNeispravanObjekat() throws Exception {
-        so.validate((AbstractDomainObject) new Object());
+        so.validate(new Klijent());
     }
 
     @Test(expected = Exception.class)

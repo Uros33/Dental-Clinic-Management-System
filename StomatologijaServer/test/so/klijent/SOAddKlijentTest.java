@@ -1,7 +1,6 @@
 package so.klijent;
 
 import db.DBBroker;
-import domain.AbstractDomainObject;
 import domain.Klijent;
 import domain.TipKlijenta;
 import java.sql.SQLException;
@@ -46,7 +45,7 @@ public class SOAddKlijentTest {
 
     @Test(expected = Exception.class)
     public void testPredusloviNeispravanObjekat() throws Exception {
-        so.validate((AbstractDomainObject) new Object());
+        so.validate(new TipKlijenta());
     }
 
     @Test(expected = Exception.class)

@@ -15,7 +15,7 @@ import java.util.Date;
  * @author Asus
  */
 public class StomatologSertifikat extends AbstractDomainObject {
-    
+
     private Sertifikat sertifikat;
     private Stomatolog stomatolog;
     private Date datumIzdavanja;
@@ -41,8 +41,8 @@ public class StomatologSertifikat extends AbstractDomainObject {
 
     @Override
     public String join() {
-        return " JOIN STOMATOLOG S ON (S.STOMATOLOGID = SS.STOMATOLOGID)\n"
-                + "JOIN SERTIFIKAT S ON (S.SERTIFIKATID = SS.SERTIFIKATID)";
+        return " JOIN STOMATOLOG S ON (S.STOMATOLOGID = SS.STOMATOLOGID) "
+                + "JOIN SERTIFIKAT SE ON (SE.SERTIFIKATID = SS.SERTIFIKATID) ";
     }
 
     @Override
@@ -50,15 +50,25 @@ public class StomatologSertifikat extends AbstractDomainObject {
         ArrayList<AbstractDomainObject> lista = new ArrayList<>();
 
         while (rs.next()) {
-            Stomatolog stom = new Stomatolog(rs.getInt("StomatologID"),
-                    rs.getString("Ime"), rs.getString("Prezime"),
-                    rs.getString("Username"), rs.getString("Password"));
-            
-            Sertifikat sert = new Sertifikat(rs.getInt("SertifikatID"),
-                    rs.getString("s.naziv"));
-            
-            StomatologSertifikat ss = new StomatologSertifikat(sert, stom, 
-                    rs.getDate("datumIzdavanja"));
+
+            Stomatolog stom = new Stomatolog(
+                    rs.getInt("StomatologID"),
+                    rs.getString("Ime"),
+                    rs.getString("Prezime"),
+                    rs.getString("Username"),
+                    rs.getString("Password")
+            );
+
+            Sertifikat sert = new Sertifikat(
+                    rs.getInt("SertifikatID"),
+                    rs.getString("Naziv")
+            );
+
+            StomatologSertifikat ss = new StomatologSertifikat(
+                    sert,
+                    stom,
+                    rs.getDate("DatumIzdavanja")
+            );
 
             lista.add(ss);
         }
@@ -69,13 +79,14 @@ public class StomatologSertifikat extends AbstractDomainObject {
 
     @Override
     public String koloneZaInsert() {
-        return " (SertifikatID, StomatologID, datumIzdavanja) ";
+        return " (SertifikatID, StomatologID, DatumIzdavanja) ";
     }
 
     @Override
     public String vrednostiZaInsert() {
-        return " " + sertifikat.getSertifikatID() + ", " + stomatolog.getStomatologID() + ", "
-                + "'" + new java.sql.Date(datumIzdavanja.getTime()) + "' ";
+        return sertifikat.getSertifikatID() + ", "
+                + stomatolog.getStomatologID() + ", "
+                + "'" + new java.sql.Date(datumIzdavanja.getTime()) + "'";
     }
 
     @Override
@@ -85,7 +96,8 @@ public class StomatologSertifikat extends AbstractDomainObject {
 
     @Override
     public String uslov() {
-        return " StomatologID = " + stomatolog.getStomatologID();
+        return " StomatologID = " + stomatolog.getStomatologID()
+                + " AND SertifikatID = " + sertifikat.getSertifikatID();
     }
 
     @Override
@@ -121,5 +133,4 @@ public class StomatologSertifikat extends AbstractDomainObject {
     public void setDatumIzdavanja(Date datumIzdavanja) {
         this.datumIzdavanja = datumIzdavanja;
     }
-
 }

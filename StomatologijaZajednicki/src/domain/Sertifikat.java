@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author Asus
  */
 public class Sertifikat extends AbstractDomainObject {
-    
+
     private int sertifikatID;
     private String naziv;
 
@@ -25,7 +25,7 @@ public class Sertifikat extends AbstractDomainObject {
 
     public Sertifikat() {
     }
-    
+
     @Override
     public String toString() {
         return naziv;
@@ -51,8 +51,11 @@ public class Sertifikat extends AbstractDomainObject {
         ArrayList<AbstractDomainObject> lista = new ArrayList<>();
 
         while (rs.next()) {
-            Sertifikat s = new Sertifikat(rs.getInt("SertifikatID"),
-                    rs.getString("s.naziv"));
+
+            Sertifikat s = new Sertifikat(
+                    rs.getInt("SertifikatID"),
+                    rs.getString("Naziv")
+            );
 
             lista.add(s);
         }
@@ -70,12 +73,12 @@ public class Sertifikat extends AbstractDomainObject {
     public String vrednostiZaInsert() {
         return "'" + naziv + "' ";
     }
-    
+
     @Override
     public String vrednostiZaUpdate() {
         return " naziv = '" + naziv + "' ";
     }
-    
+
     @Override
     public String uslov() {
         return " sertifikatID = " + sertifikatID;
@@ -106,5 +109,4 @@ public class Sertifikat extends AbstractDomainObject {
     public void setNaziv(String naziv) {
         this.naziv = naziv;
     }
-    
 }
