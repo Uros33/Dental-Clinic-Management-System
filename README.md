@@ -7,29 +7,31 @@
 
 A Java desktop client-server application for managing the daily operations of a dental clinic.
 
-The system was developed as my Bachelor's thesis at the **Faculty of Organizational Sciences, University of Belgrade**. It provides functionality for managing clients, dental services and appointments through a Java Swing graphical user interface, while the application logic and database communication are handled by a separate server application.
+The system was developed as my Bachelor's thesis at the **Faculty of Organizational Sciences, University of Belgrade**.
+
+It provides functionality for managing clients, dental services and appointments through a Java Swing graphical user interface, while business logic and database communication are handled by a separate server application.
 
 ---
 
 ## 📌 Overview
 
-The application was designed using a **client-server and three-tier architecture**.
+The application follows a **client-server architecture** with a separation between the presentation, business logic and database layers.
 
-The system is divided into three main projects:
+The system is divided into three NetBeans projects:
 
 - `StomatologijaKlijent` – client application and Java Swing user interface
-- `StomatologijaServer` – server, business logic and database access
+- `StomatologijaServer` – server application, business logic and database access
 - `StomatologijaZajednicki` – shared domain classes and communication objects
 
 The client and server communicate using **TCP sockets** and serialized Java objects.
 
-The server processes requests, executes business operations and communicates with a **MySQL database through JDBC**.
+The server receives requests from clients, executes the corresponding business operations and communicates with a **MySQL database using JDBC**.
 
 ---
 
-## ✨ Features
+# ✨ Features
 
-### Authentication
+## 🔐 Authentication
 
 - Dentist login
 - Username and password validation
@@ -37,7 +39,7 @@ The server processes requests, executes business operations and communicates wit
 - User session management
 - Logout functionality
 
-### Client Management
+## 👤 Client Management
 
 - Add new clients
 - Search clients by first name, last name and email
@@ -47,17 +49,21 @@ The server processes requests, executes business operations and communicates wit
 - Assign client types
 - Email validation
 - Phone number validation
-- Duplicate email and phone number validation
+- Duplicate email validation
+- Duplicate phone number validation
 
-### Dental Service Management
+## 🦷 Dental Service Management
 
 - Add dental services
 - Search services
 - Update services
 - Delete services
-- Define service name, description, price and duration
+- Define service name
+- Define service description
+- Define service price
+- Define service duration
 
-### Appointment Management
+## 📅 Appointment Management
 
 - Create appointments
 - Search appointments by client
@@ -71,7 +77,7 @@ The server processes requests, executes business operations and communicates wit
 - Automatic final price calculation
 - Validation that appointments cannot be created in the past
 
-### Server Administration
+## 🖥️ Server Administration
 
 - Start and stop the server
 - Visual server status
@@ -85,23 +91,25 @@ The server processes requests, executes business operations and communicates wit
 
 ## Main Application
 
-The main client interface is the central part of the application and provides access to appointment, client and service management.
+The main client interface provides access to appointment, client and dental service management.
 
-![Main application](images/glavna_forma.png)
+![Main application](images/glavna_forma.jpg)
 
 ---
 
 ## Appointment Management
 
-Appointments can contain multiple dental services. The system calculates the total amount, applicable client discount and final price.
+Appointments can contain multiple dental services.
 
-![Appointment details](images/termin_prikaz.png)
+The system automatically calculates the total amount, applicable client discount and final price.
+
+![Appointment details](images/termin_prikaz.jpg)
 
 ### Appointment Search
 
 Existing appointments can be displayed and filtered using client information.
 
-![Appointment search](images/termin_pretraga.png)
+![Appointment search](images/termin_pretraga.jpg)
 
 ---
 
@@ -109,11 +117,11 @@ Existing appointments can be displayed and filtered using client information.
 
 Clients can be searched using multiple criteria including first name, last name and email.
 
-![Client search](images/klijent_pretraga.png)
+![Client search](images/klijent_pretraga.jpg)
 
 Detailed client information can be viewed, updated or deleted.
 
-![Client details](images/klijent_detalji.png)
+![Client details](images/klijent_detalji.jpg)
 
 ---
 
@@ -121,21 +129,21 @@ Detailed client information can be viewed, updated or deleted.
 
 Dentists must authenticate before accessing the application's functionality.
 
-![Login form](images/login.png)
+![Login form](images/login.jpg)
 
 ---
 
 ## Server Application
 
-The server application handles incoming client connections, application logic and database communication.
+The server application handles incoming client connections, business operations and database communication.
 
-![Server running](images/server_pokrenut.png)
+![Server running](images/server_pokrenut.jpg)
 
 ---
 
 # 🏗️ Architecture
 
-The application uses a **three-tier client-server architecture**.
+The application uses a layered **client-server architecture**.
 
 ```mermaid
 flowchart LR
@@ -166,7 +174,7 @@ flowchart LR
     B --> A
 ```
 
-### Communication Flow
+## Communication Flow
 
 A typical request follows this path:
 
@@ -215,9 +223,16 @@ Communication between the client and server is implemented using:
 - `Response`
 - operation codes
 
-The `Request` object contains the requested operation and the data that should be processed.
+The `Request` object contains:
 
-The server processes the request and sends a `Response` object back to the client.
+- the requested operation
+- the data that should be processed
+
+The server processes the request and returns a `Response` object containing:
+
+- response data
+- response status
+- exception information if an error occurs
 
 ---
 
@@ -233,11 +248,9 @@ For every connected client, the server creates a separate:
 ThreadClient
 ```
 
-which receives and processes requests independently.
+Each `ThreadClient` independently receives requests from its connected client and sends responses back through the socket connection.
 
 This allows multiple application clients to communicate with the server.
-
-Some client-side table models also use background threads to periodically refresh displayed data.
 
 ---
 
@@ -264,6 +277,8 @@ SOAddTermin
 SOUpdateTermin
 SODeleteTermin
 SOGetAllTermin
+
+SOGetAllTipKlijenta
 ```
 
 All system operations extend:
@@ -272,7 +287,7 @@ All system operations extend:
 AbstractSO
 ```
 
-`AbstractSO` provides a common execution workflow:
+`AbstractSO` defines a common execution workflow:
 
 ```text
 Validate request
@@ -290,7 +305,7 @@ Exception
 Rollback transaction
 ```
 
-This centralizes validation and transaction handling for business operations.
+This centralizes validation and transaction management for business operations.
 
 ---
 
@@ -298,16 +313,16 @@ This centralizes validation and transaction handling for business operations.
 
 Database communication is handled by the `DBBroker` class.
 
-`DBBroker` is implemented as a singleton and provides generic database operations such as:
+`DBBroker` is implemented as a singleton and provides reusable database operations such as:
 
 - SELECT
 - INSERT
 - UPDATE
 - DELETE
-- transaction commit
-- transaction rollback
 
 Database access is implemented using **JDBC**.
+
+Transaction handling is coordinated by the `AbstractSO` class, which commits a transaction when an operation completes successfully and rolls it back when an exception occurs.
 
 The application uses a MySQL database named:
 
@@ -315,7 +330,7 @@ The application uses a MySQL database named:
 stomatologija
 ```
 
-The repository contains the SQL script required to create and populate the database:
+The repository contains the SQL script required to create the database structure and populate it with initial data:
 
 ```text
 stomatologija.sql
@@ -338,7 +353,11 @@ The database contains the following main entities:
 | `Sertifikat` | Dentist certificate |
 | `StomatologSertifikat` | Relationship between dentists and certificates |
 
-### Main Relationships
+## Database Diagram
+
+![Database model](stomatologija.png)
+
+## Main Relationships
 
 ```text
 Stomatolog
@@ -381,13 +400,13 @@ Sertifikat
 StomatologSertifikat
 ```
 
-Domain classes extend a common:
+Most domain classes extend the common:
 
 ```java
 AbstractDomainObject
 ```
 
-which defines methods used by the generic database broker for:
+This abstraction defines methods used by the generic database broker for:
 
 - table names
 - SQL aliases
@@ -396,9 +415,36 @@ which defines methods used by the generic database broker for:
 - insert values
 - update values
 - query conditions
-- object mapping
+- ordering
+- object mapping from `ResultSet`
 
-This allows database operations to work with different domain objects through a shared abstraction.
+This allows database operations to work with different domain objects through a shared interface.
+
+---
+
+# 💰 Appointment Pricing and Discounts
+
+Each appointment can contain multiple dental services.
+
+The system stores:
+
+```text
+IznosBezPopusta
+Popust
+KonacanIznos
+```
+
+Client categories determine the discount percentage.
+
+The sample database contains:
+
+```text
+Standardni → 0%
+Premium    → 10%
+VIP        → 20%
+```
+
+The final appointment price is calculated according to the applicable client discount.
 
 ---
 
@@ -406,9 +452,15 @@ This allows database operations to work with different domain objects through a 
 
 The project includes automated tests implemented using **JUnit 4**.
 
-The following core system operations are covered by automated tests:
+Tests are located in:
 
-### `SOLoginTest`
+```text
+StomatologijaServer/test
+```
+
+The following core system operations are covered:
+
+## `SOLoginTest`
 
 Tests include:
 
@@ -419,7 +471,7 @@ Tests include:
 - nonexistent username
 - prevention of duplicate login sessions
 
-### `SOAddKlijentTest`
+## `SOAddKlijentTest`
 
 Tests include:
 
@@ -432,7 +484,7 @@ Tests include:
 - successful client creation
 - unsuccessful client creation
 
-### `SOAddTerminTest`
+## `SOAddTerminTest`
 
 Tests include:
 
@@ -443,7 +495,7 @@ Tests include:
 - successful appointment creation
 - unsuccessful appointment creation
 
-### `SOUpdateTerminTest`
+## `SOUpdateTerminTest`
 
 Tests include:
 
@@ -454,7 +506,7 @@ Tests include:
 - successful update of appointment data
 - unsuccessful appointment update
 
-Some tests execute system operations against the configured database and clean up generated test data after execution.
+Some integration-style tests execute system operations against the configured MySQL database.
 
 ---
 
@@ -468,9 +520,10 @@ Some tests execute system operations against the configured database and clean u
 | **MySQL** | Relational database |
 | **Java Sockets** | Client-server communication |
 | **Java Serialization** | Sending objects between client and server |
-| **Multithreading** | Handling multiple clients and background refresh |
+| **Multithreading** | Handling multiple connected clients |
 | **JUnit 4** | Automated testing |
 | **Apache NetBeans** | Development environment |
+| **Apache Ant** | Project build system used by NetBeans |
 | **SQL** | Database creation and manipulation |
 
 ---
@@ -478,44 +531,57 @@ Some tests execute system operations against the configured database and clean u
 # 📂 Project Structure
 
 ```text
-Stomatologija/
-│
-├── images/
-│   ├── glavna_forma.png
-│   ├── klijent_detalji.png
-│   ├── klijent_pretraga.png
-│   ├── login.png
-│   ├── server_pokrenut.png
-│   ├── termin_pretraga.png
-│   └── termin_prikaz.png
+Dental-Clinic-Management-System/
 │
 ├── StomatologijaKlijent/
+│   ├── src/
+│   ├── nbproject/
+│   ├── build.xml
+│   └── manifest.mf
 │
 ├── StomatologijaServer/
+│   ├── src/
+│   ├── test/
+│   ├── nbproject/
+│   ├── build.xml
+│   └── manifest.mf
 │
 ├── StomatologijaZajednicki/
+│   ├── src/
+│   ├── nbproject/
+│   ├── build.xml
+│   └── manifest.mf
+│
+├── images/
+│   ├── glavna_forma.jpg
+│   ├── klijent_detalji.jpg
+│   ├── klijent_pretraga.jpg
+│   ├── login.jpg
+│   ├── server_pokrenut.jpg
+│   ├── termin_pretraga.jpg
+│   └── termin_prikaz.jpg
 │
 ├── mysql-connector-j-9.5.0.jar
 ├── stomatologija.drawio
 ├── stomatologija.png
 ├── stomatologija.sql
-│
+├── .gitignore
 └── README.md
 ```
 
-### `StomatologijaKlijent`
+## `StomatologijaKlijent`
 
 Contains the client-side application:
 
 ```text
-GUI Forms
+Java Swing GUI Forms
 ClientController
 Session
 Table Models
 Socket Communication
 ```
 
-### `StomatologijaServer`
+## `StomatologijaServer`
 
 Contains the server-side application:
 
@@ -529,7 +595,7 @@ DBBroker
 JUnit Tests
 ```
 
-### `StomatologijaZajednicki`
+## `StomatologijaZajednicki`
 
 Contains classes shared between the client and server:
 
@@ -550,9 +616,15 @@ ResponseStatus
 Before running the application, make sure you have:
 
 - Java JDK
-- MySQL Server
 - Apache NetBeans
+- MySQL Server
 - MySQL JDBC Connector
+
+The projects are configured for Java source level:
+
+```text
+Java 8
+```
 
 ---
 
@@ -566,13 +638,19 @@ stomatologija.sql
 
 into MySQL.
 
-The script creates the required database structure and initial data.
+The script creates:
+
+```text
+stomatologija
+```
+
+and populates the database with initial demo data.
 
 ---
 
-## 2. Open the Projects
+## 2. Open the Projects in NetBeans
 
-Open the following projects in Apache NetBeans:
+Open these three projects:
 
 ```text
 StomatologijaZajednicki
@@ -580,35 +658,101 @@ StomatologijaServer
 StomatologijaKlijent
 ```
 
-Make sure that the client and server projects have access to the shared `StomatologijaZajednicki` project.
+---
+
+## 3. Build the Shared Project First
+
+The client and server depend on the shared project:
+
+```text
+StomatologijaZajednicki
+```
+
+Before running the application, first perform:
+
+```text
+Clean and Build
+```
+
+on:
+
+```text
+StomatologijaZajednicki
+```
+
+This generates:
+
+```text
+StomatologijaZajednicki/dist/StomatologijaZajednicki.jar
+```
+
+which is used by both the client and server projects.
+
+The generated `dist/` directory is intentionally excluded from Git because it is build output.
 
 ---
 
-## 3. Configure the Database
+## 4. Build the Server and Client
 
-Start the server application and configure the database connection using:
-
-```text
-Konfiguracija baze
-```
-
-Enter the required:
+After building the shared project, build:
 
 ```text
-Database name
-Username
-Password
+StomatologijaServer
 ```
 
-The configuration is stored in:
+and then:
+
+```text
+StomatologijaKlijent
+```
+
+The server project also uses:
+
+```text
+mysql-connector-j-9.5.0.jar
+```
+
+located in the root of the repository.
+
+---
+
+## 5. Configure the Database
+
+The server reads the database configuration from:
 
 ```text
 dbconfig.properties
 ```
 
+This file is intentionally excluded from Git because database credentials are local configuration.
+
+The file is located inside:
+
+```text
+StomatologijaServer/
+```
+
+Example configuration:
+
+```properties
+url=jdbc:mysql://localhost:3306/stomatologija
+username=root
+password=
+```
+
+If your MySQL user requires a password, enter the corresponding password value.
+
+The configuration can also be edited through the server application's:
+
+```text
+Konfiguracija baze
+```
+
+menu.
+
 ---
 
-## 4. Start the Server
+## 6. Start the Server
 
 Run:
 
@@ -622,7 +766,7 @@ and click:
 Pokreni server
 ```
 
-After the server starts successfully, it listens for client connections on:
+After startup, the server listens for connections on:
 
 ```text
 localhost:9000
@@ -630,7 +774,7 @@ localhost:9000
 
 ---
 
-## 5. Start the Client
+## 7. Start the Client
 
 Run:
 
@@ -640,9 +784,27 @@ StomatologijaKlijent
 
 The login window will appear.
 
-Authenticate using a dentist account stored in the database.
+Authenticate using one of the dentist accounts stored in the sample database.
 
 After successful authentication, the main application interface will be displayed.
+
+---
+
+# 🔒 Local and Generated Files
+
+The repository uses `.gitignore` to exclude generated and machine-specific files such as:
+
+```text
+build/
+dist/
+nbproject/private/
+dbconfig.properties
+.class files
+IDE configuration
+temporary files
+```
+
+This keeps the repository focused on source code and project configuration required to rebuild the application.
 
 ---
 
@@ -653,7 +815,7 @@ This project was developed as a **Bachelor's thesis** at:
 **University of Belgrade**  
 **Faculty of Organizational Sciences**
 
-### Thesis
+## Thesis
 
 **Software System for Monitoring the Work of a Dental Practice in Java Environment**
 
@@ -668,9 +830,10 @@ The project demonstrates the practical implementation of:
 - Object-Oriented Programming
 - Desktop Application Development
 - Client-Server Architecture
-- Three-Tier Architecture
+- Layered Application Architecture
 - Relational Database Design
 - Socket Communication
+- Java Object Serialization
 - Multithreading
 - Transaction Management
 - Generic Database Access
