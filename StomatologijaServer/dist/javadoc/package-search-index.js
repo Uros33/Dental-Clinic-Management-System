@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"controller"},{"l":"db"},{"l":"forms"},{"l":"so"},{"l":"so.klijent"},{"l":"so.login"},{"l":"so.termin"},{"l":"so.tip_klijenta"},{"l":"so.usluga"},{"l":"thread"}];updateSearchResults();
